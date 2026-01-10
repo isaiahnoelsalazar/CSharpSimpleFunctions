@@ -4,12 +4,15 @@ on:
   push:
     branches: [master]
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build:
     runs-on: windows-latest  # Changed: Required for legacy .csproj and MSBuild
     outputs: 
-      Version: ${{ steps.gitversion.outputs.SemVer }}
-      CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }} 
+      Version: ${{ steps.get_version.outputs.VERSION }}
 
     steps:
     - uses: actions/checkout@v4
@@ -22,15 +25,20 @@ jobs:
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v2
 
-    # Install and calculate the new version with GitVersion  
-    - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v0.10.2
-      with:
-        versionSpec: 5.x
-
-    - name: Determine Version
-      uses: gittools/actions/gitversion/execute@v0.10.2
-      id: gitversion 
+    - name: Get Version from AssemblyInfo
+      id: get_version
+      shell: pwsh
+      run: |
+        $path = "Properties/AssemblyInfo.cs"
+        $content = Get-Content $path
+        if ($content -match '\[assembly: AssemblyVersion\("(.*)"\)\]') {
+            $ver = $matches[1]
+            echo "VERSION=$ver" >> $env:GITHUB_OUTPUT
+            echo "Found version: $ver"
+        } else {
+            Write-Error "Could not find version in AssemblyInfo.cs"
+            exit 1
+        }
 
     - name: Restore NuGet Packages
       run: nuget restore ${{ vars.CS_PROJ_PATH }}
@@ -71,7 +79,6 @@ jobs:
       run: dotnet nuget push nugetPackage\*.nupkg --api-key ${{ secrets.NUGET_APIKEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
     
     - name: Create Release
-      if: needs.build.outputs.CommitsSinceVersionSource > 0
       uses: ncipollo/release-action@v1.13.0
       with:
         tag: ${{ needs.build.outputs.Version }}
