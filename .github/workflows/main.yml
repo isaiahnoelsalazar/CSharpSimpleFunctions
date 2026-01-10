@@ -36,12 +36,12 @@ jobs:
       run: nuget restore ${{ vars.CS_PROJ_PATH }}
 
     - name: Build Project
-      run: msbuild ${{ vars.CS_PROJ_PATH }} /p:Configuration=Release /p:Platform="Any CPU"
+      run: msbuild ${{ vars.CS_PROJ_PATH }} /p:Configuration=Release /p:Platform=AnyCPU
 
     - name: Create NuGet Package with GitVersion
       # Changed: Uses nuget.exe pack. 
       run: |
-        nuget pack ${{ vars.CS_PROJ_PATH }} -Properties Configuration=Release -OutputDirectory bin\Release
+        nuget pack ${{ vars.CS_PROJ_PATH }} -Properties "Configuration=Release;Platform=AnyCPU" -OutputDirectory bin\Release
 
     - name: Upload NuGet package to GitHub
       uses: actions/upload-artifact@v4
