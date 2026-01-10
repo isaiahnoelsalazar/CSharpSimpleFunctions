@@ -30,6 +30,9 @@ jobs:
       shell: pwsh
       run: |
         $path = "Properties/AssemblyInfo.cs"
+        if (!(Test-Path $path)) { 
+            Write-Error "File not found at $path"; exit 1 
+        }
         $content = Get-Content $path
         if ($content -match '\[assembly: AssemblyVersion\("(.*)"\)\]') {
             $ver = $matches[1]
