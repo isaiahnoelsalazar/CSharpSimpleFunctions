@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: windows-latest  # Changed: Required for legacy .csproj and MSBuild
+    runs-on: windows-latest
     outputs: 
       Version: ${{ steps.get_version.outputs.VERSION }}
 
@@ -49,10 +49,10 @@ jobs:
     - name: Build Project
       run: msbuild ${{ vars.CS_PROJ_PATH }} /p:Configuration=Release /p:Platform=AnyCPU
 
-    - name: Create NuGet Package with GitVersion
+    - name: Create NuGet Package
       # Changed: Uses nuget.exe pack. 
       run: |
-        nuget pack ${{ vars.CS_PROJ_PATH }} -Properties "Configuration=Release;Platform=AnyCPU" -OutputDirectory bin\Release
+        nuget pack ${{ vars.CS_PROJ_PATH }} -Properties "Configuration=Release;Platform=AnyCPU;RepositoryUrl=${{ github.event.repository.html_url }};RepositoryType=git" -OutputDirectory bin\Release
 
     - name: Upload NuGet package to GitHub
       uses: actions/upload-artifact@v4
@@ -61,7 +61,7 @@ jobs:
         path: bin/Release/*.nupkg
 
   release:
-    runs-on: windows-latest # Changed for consistency
+    runs-on: windows-latest
     needs: build
     if: github.ref == 'refs/heads/master'
     
@@ -73,7 +73,6 @@ jobs:
         path: nugetPackage
 
     - name: Push package to GitHub packages 
-      # Legacy projects still use the dotnet tool for pushing safely, or nuget.exe
       run: |
         dotnet nuget add source --username ${{ vars.USERNAME }} --password ${{ secrets.NUGET_PACKAGE_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ vars.USERNAME }}/index.json"
         dotnet nuget push nugetPackage\*.nupkg --api-key ${{ secrets.NUGET_PACKAGE_TOKEN }} --source "github" --skip-duplicate
@@ -87,4 +86,4 @@ jobs:
         tag: ${{ needs.build.outputs.Version }}
         name: Release ${{ needs.build.outputs.Version }}
         artifacts: "nugetPackage/*"
-        token: ${{ secrets.GITHUB_TOKEN }} # Use the default GITHUB_TOKEN for releases
+        token: ${{ secrets.GITHUB_TOKEN }}
