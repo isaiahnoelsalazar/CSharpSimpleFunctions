@@ -46,6 +46,7 @@
     <Compile Include="Convert.cs" />
     <Compile Include="Memory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SimpleFileHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LICENSE" />
