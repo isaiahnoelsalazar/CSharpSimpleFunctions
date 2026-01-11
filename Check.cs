@@ -5,6 +5,9 @@ namespace CSharpSimpleFunctions
 {
     public class Check
     {
+        static string Numbers = "0123456789";
+        static string Symbols = "~`!@#$%^&*()_+-=[]{}\\|'\";:,.<>/?";
+
         public static class Email
         {
             static Memory<string> ValidDomainNames = new Memory<string>();
@@ -77,7 +80,6 @@ namespace CSharpSimpleFunctions
         public static bool IsAllNumbers(string s)
         {
             bool Value = true;
-            string Numbers = "0123456789";
             foreach (char a in s)
             {
                 if (!Numbers.Contains(a))
@@ -90,7 +92,6 @@ namespace CSharpSimpleFunctions
 
         public static bool HasNumbers(string s)
         {
-            string Numbers = "0123456789";
             foreach (char a in s)
             {
                 foreach (char b in Numbers)
@@ -106,7 +107,6 @@ namespace CSharpSimpleFunctions
 
         public static bool HasSymbols(string s)
         {
-            string Symbols = "~`!@#$%^&*()_+-=[]{}\\|'\";:,.<>/?";
             foreach (char a in s)
             {
                 foreach (char b in Symbols)
