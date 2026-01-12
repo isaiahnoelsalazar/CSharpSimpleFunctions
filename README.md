@@ -1,4 +1,6 @@
-﻿﻿# How to install?
+﻿# NOTE
+This NuGet package will not be updated anymore. It was only created as a test for .NET Framework 4.7.2. Please use [NETSimpleFunctions](https://www.nuget.org/packages/NETSimpleFunctions) instead for future projects.
+# How to install?
 ### In Visual Studio
 #### Step 1
 - Go to "Tools > NuGet Package Manager > Manage NuGet Packages for Solution"
